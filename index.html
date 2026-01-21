@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Audio Detector — Doorbell & Fire Alarm</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="card">
+    <h1>Audio Detector</h1>
+    <div>Status: <span id="status">Idle</span></div>
+
+    <button id="startBtn">Start Listening</button>
+    <button id="stopBtn" disabled>Stop</button>
+    <button id="settingsBtn" class="secondary">Settings</button>
+
+    <div id="alertBox"></div>
+
+    <h3>Event Log</h3>
+    <div id="eventLog"></div>
+
+    <div id="settingsPanel">
+      <h3>Settings</h3>
+
+      <label>
+        <input type="checkbox" id="notifSetting">
+        Enable Notifications
+      </label>
+      <br><br>
+
+      <label>
+        <input type="checkbox" id="darkSetting">
+        Dark Mode
+      </label>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.14.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
