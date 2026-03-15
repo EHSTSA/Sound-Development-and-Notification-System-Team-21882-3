@@ -52,7 +52,7 @@ function niceError(code) {
     'auth/weak-password':          'Password must be at least 6 characters.',
     'auth/popup-closed-by-user':   'Sign-in popup was closed.',
     'auth/network-request-failed': 'Network error — check your connection.',
-  })[code] || 'Something went wrong. Please try again.';
+  })[code] || `Error: ${code}`;
 }
 
 // ── Auth tab switch ───────────────────────────────────────────────────────────
