@@ -360,3 +360,41 @@ input[type=range]::-webkit-slider-thumb {
   .controls { grid-template-columns: 1fr; }
   .btn-primary { grid-column: span 1; }
 }
+
+/* ── Alert tiers ── */
+.alert-danger {
+  background: var(--alert-fire-bg);
+  border-color: var(--alert-fire-border);
+  color: var(--alert-fire-text);
+  animation: slide-in 0.2s ease, fire-flash 0.5s ease 0.2s 3;
+}
+
+.alert-warn {
+  background: var(--alert-door-bg);
+  border-color: var(--alert-door-border);
+  color: var(--alert-door-text);
+}
+
+.alert-info {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Sound toggle groups ── */
+.toggle-group-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 14px 0 6px;
+}
+
+.sound-row {
+  padding: 8px 0;
+}
+
+.sound-row .setting-label {
+  font-size: 0.875rem;
+}
