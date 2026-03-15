@@ -70,7 +70,7 @@
       <div class="setting-row">
         <div>
           <div class="setting-label">Notifications</div>
-          <div class="setting-desc">Alert me even when tab is in background</div>
+          <div class="setting-desc">Alert when tab is in background</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="notifSetting">
@@ -88,6 +88,9 @@
           <span class="slider-val" id="thresholdVal">0.20</span>
         </div>
       </div>
+
+      <div class="settings-title" style="margin-top:18px">Monitored Sounds</div>
+      <div id="soundToggles"></div>
     </div>
 
     <!-- Event log -->
@@ -101,7 +104,6 @@
 
   </div>
 
-  <!-- TF.js only — YAMNet loads directly from TF Hub -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.14.0/dist/tf.min.js"></script>
   <script src="app.js"></script>
 </body>
