@@ -2,7 +2,8 @@ import { initializeApp }                       from "https://www.gstatic.com/fir
 import { getAuth, onAuthStateChanged, signOut,
          signInWithEmailAndPassword,
          createUserWithEmailAndPassword,
-         GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+         GoogleAuthProvider, signInWithRedirect,
+         getRedirectResult } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 // ── Firebase ──────────────────────────────────────────────────────────────────
 const firebaseConfig = {
@@ -86,12 +87,17 @@ signUpBtn.onclick = async () => {
 };
 
 googleBtn.onclick = async () => {
-  authErr(''); setBusy(googleBtn, true);
-  try { await signInWithPopup(auth, gProvider); }
+  authErr('');
+  setBusy(googleBtn, true);
+  googleBtn.textContent = 'Redirecting…';
+  try { await signInWithRedirect(auth, gProvider); }
   catch (e) { authErr(niceError(e.code)); setBusy(googleBtn, false); }
 };
 
 signOutBtn.onclick = () => { stopListening(); signOut(auth); };
+
+// Handle redirect result when returning from Google sign-in
+getRedirectResult(auth).catch(e => { authErr(niceError(e.code)); });
 
 onAuthStateChanged(auth, user => {
   if (user) {
