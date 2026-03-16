@@ -300,44 +300,21 @@ async function startListening() {
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); }
   catch (e) { addLog('Mic error: ' + e.message); statusEl.textContent = 'Mic denied'; return; }
 
-  try {
-    audioCtx = new AudioContext();
-    nativeSR = audioCtx.sampleRate;
-    samples  = [];
+  audioCtx = new AudioContext();
+  await audioCtx.resume(); // ensure context is running after user gesture
+  nativeSR = audioCtx.sampleRate;
+  samples  = [];
 
-    // Inline the worklet as a blob so no external file is needed
-    const workletCode = `
-      class SampleCollector extends AudioWorkletProcessor {
-        process(inputs) {
-          const ch = inputs[0]?.[0];
-          if (ch) this.port.postMessage(ch.slice());
-          return true;
-        }
-      }
-      registerProcessor('sample-collector', SampleCollector);
-    `;
-    const blob = new Blob([workletCode], { type: 'application/javascript' });
-    const blobURL = URL.createObjectURL(blob);
-    await audioCtx.audioWorklet.addModule(blobURL);
-    URL.revokeObjectURL(blobURL);
-
-    srcNode  = audioCtx.createMediaStreamSource(stream);
-    procNode = new AudioWorkletNode(audioCtx, 'sample-collector');
-
-    const maxBuf = nativeSR * 6;
-    procNode.port.onmessage = e => {
-      samples.push(...e.data);
-      if (samples.length > maxBuf) samples = samples.slice(samples.length - maxBuf);
-    };
-
-    srcNode.connect(procNode);
-    // AudioWorkletNode doesn't need to connect to destination to run
-  } catch (e) {
-    addLog('Audio setup error: ' + e.message);
-    audioCtx?.close();
-    audioCtx = srcNode = procNode = null;
-    return;
-  }
+  srcNode  = audioCtx.createMediaStreamSource(stream);
+  procNode = audioCtx.createScriptProcessor(4096, 1, 1);
+  const maxBuf = nativeSR * 6;
+  procNode.onaudioprocess = e => {
+    const chunk = e.inputBuffer.getChannelData(0);
+    samples.push(...chunk);
+    if (samples.length > maxBuf) samples = samples.slice(samples.length - maxBuf);
+  };
+  srcNode.connect(procNode);
+  procNode.connect(audioCtx.destination);
 
   listening = true;
   timer = setInterval(runInference, POLL_MS);
@@ -350,7 +327,6 @@ async function startListening() {
 function stopListening() {
   if (!listening) return;
   clearInterval(timer);
-  procNode?.port.close();
   procNode?.disconnect();
   srcNode?.disconnect();
   audioCtx?.close();
