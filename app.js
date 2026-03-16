@@ -295,22 +295,36 @@ async function runInference() {
 async function startListening() {
   if (!model) await loadModel();
   if (listening) return;
+
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); }
   catch (e) { addLog('Mic error: ' + e.message); statusEl.textContent = 'Mic denied'; return; }
 
-  audioCtx = new AudioContext();
-  nativeSR = audioCtx.sampleRate;
-  samples  = [];
-  srcNode  = audioCtx.createMediaStreamSource(stream);
-  procNode = audioCtx.createScriptProcessor(4096, 1, 1);
-  const maxBuf = nativeSR * 6;
-  procNode.onaudioprocess = e => {
-    samples.push(...e.inputBuffer.getChannelData(0));
-    if (samples.length > maxBuf) samples = samples.slice(samples.length - maxBuf);
-  };
-  srcNode.connect(procNode);
-  procNode.connect(audioCtx.destination);
+  try {
+    audioCtx = new AudioContext();
+    nativeSR = audioCtx.sampleRate;
+    samples  = [];
+
+    // Load the AudioWorklet processor from the same directory
+    await audioCtx.audioWorklet.addModule('processor.js');
+
+    srcNode  = audioCtx.createMediaStreamSource(stream);
+    procNode = new AudioWorkletNode(audioCtx, 'sample-collector');
+
+    const maxBuf = nativeSR * 6;
+    procNode.port.onmessage = e => {
+      samples.push(...e.data);
+      if (samples.length > maxBuf) samples = samples.slice(samples.length - maxBuf);
+    };
+
+    srcNode.connect(procNode);
+    // AudioWorkletNode doesn't need to connect to destination to run
+  } catch (e) {
+    addLog('Audio setup error: ' + e.message);
+    audioCtx?.close();
+    audioCtx = srcNode = procNode = null;
+    return;
+  }
 
   listening = true;
   timer = setInterval(runInference, POLL_MS);
@@ -323,7 +337,10 @@ async function startListening() {
 function stopListening() {
   if (!listening) return;
   clearInterval(timer);
-  procNode?.disconnect(); srcNode?.disconnect(); audioCtx?.close();
+  procNode?.port.close();
+  procNode?.disconnect();
+  srcNode?.disconnect();
+  audioCtx?.close();
   procNode = srcNode = audioCtx = null;
   samples = []; listening = false;
   if (startBtn) { startBtn.disabled = false; stopBtn.disabled = true; }
