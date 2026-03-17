@@ -22,8 +22,10 @@ const EMAILJS_TEMPLATE_ID = 'template_fa9wwjj';
 const EMAILJS_PUBLIC_KEY  = 'RHqaBdMrcFqQqpQsq';
 
 async function sendEmail(sound, score) {
-  if (!emailSetting.checked) return;
-  const toEmail = emailAddressInput.value.trim();
+  const emailSetting     = document.getElementById('emailSetting');
+  const emailAddressInput = document.getElementById('emailAddress');
+  if (!emailSetting?.checked) return;
+  const toEmail = emailAddressInput?.value.trim();
   if (!toEmail) return;
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
