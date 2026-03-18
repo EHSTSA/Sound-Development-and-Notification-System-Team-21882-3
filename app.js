@@ -38,7 +38,7 @@ async function sendEmail(sound, score) {
 
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email: toEmail,
+      email: toEmail,
       sound: sound.label,
       emoji: sound.emoji,
       score: score.toFixed(3),
