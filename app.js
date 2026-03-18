@@ -398,6 +398,7 @@ async function runInference() {
     beep(best.tier);
     notify(best);
     await sendEmail(best, bestScore);
+    await flashScreen(3);
   }
 }
 
