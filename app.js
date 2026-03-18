@@ -512,3 +512,16 @@ function stopListening() {
 
 startBtn.onclick = startListening;
 stopBtn.onclick = stopListening;
+
+async function flashScreen(times = 3) {
+  const overlay = document.getElementById("flashOverlay");
+  if (!overlay) return;
+
+  for (let i = 0; i < times; i++) {
+    overlay.style.opacity = "1";
+    await new Promise(r => setTimeout(r, 100)); // flash on
+
+    overlay.style.opacity = "0";
+    await new Promise(r => setTimeout(r, 150)); // flash off
+  }
+}
