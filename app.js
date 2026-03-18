@@ -397,7 +397,7 @@ async function runInference() {
     addLog(`${best.emoji} ${best.label} — score ${bestScore.toFixed(3)}`);
     beep(best.tier);
     notify(best);
-    sendEmail(best, bestScore);
+    await sendEmail(best, bestScore);
   }
 }
 
